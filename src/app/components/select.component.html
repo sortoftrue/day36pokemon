@@ -1,0 +1,14 @@
+<form [formGroup]="form" (ngSubmit)="add()">
+    Pokemon to add<br>
+    <input type="text" formControlName="pokemonName">
+    <button type="submit">Add!</button>
+</form>
+
+<table>
+    <tr *ngFor="let p of pokemonList">
+        <a [routerLink]="['view', p]">
+            {{p}}
+        </a>
+    </tr>
+    
+</table>
