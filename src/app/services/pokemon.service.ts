@@ -63,7 +63,7 @@ export class PokemonService {
       for(let pokemon of this._pokemonList){
         console.log(pokemon)
       }
-
+      //DEXIE
     }
 
 
