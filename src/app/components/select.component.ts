@@ -19,7 +19,9 @@ export class SelectComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.createForm();
+    this.pokeSvc.getFromLocal();
     this.pokemonList = this.pokeSvc.pokemonList;
+    console.info(">>>retrieved:", localStorage.getItem("pokeList"))
 
 }
 
@@ -39,6 +41,10 @@ add(){
   
 }
 
+deletePokemon(index : number){
+  console.info("deleting", index)
+  this.pokeSvc.deletePokemon(index);
+}
 
 
 

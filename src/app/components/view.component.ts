@@ -31,31 +31,29 @@ export class ViewComponent implements OnInit, OnDestroy{
 
   getPokemonDetailsFromAPI(name: String){
 
-    // const response$ = lastValueFrom(
-    //   this.httpClient.get('https://pokeapi.co/api/v2/pokemon/'+ name.toLowerCase()));
+    const response$: Promise<any> = lastValueFrom(
+      this.httpClient.get('https://pokeapi.co/api/v2/pokemon/'+ name.toLowerCase()));
+
     
-    const response$ = 
-      this.httpClient.get('https://pokeapi.co/api/v2/pokemon/'+ name.toLowerCase()).subscribe({
-        //@ts-ignore
-        next: (data) => console.log(data.name)
-      });
+    // const response$ = 
+    //   this.httpClient.get('https://pokeapi.co/api/v2/pokemon/'+ name.toLowerCase()).subscribe({
+        
+    //     next: (data) => console.log(data.name)
+    //   });
     
     
     console.log(response$)
-    
 
-    // response$.then(
-    //   (result)=>{
-    //     console.log(result);
+    response$.then(
+      (result)=>{
+        console.log(result);
         
-    //     console.log(result.abilities[0].ability.name);
-    //     //@ts-ignore
-    //     this.pokeDetails = {name: result.name, type: result.types[0].type.name};
-    //     console.log(this.pokeDetails);
-    //   }
-    // )
-
-
+        console.log(result.abilities[0].ability.name);
+        
+        this.pokeDetails = {name: result.name, type: result.types[0].type.name};
+        console.log(this.pokeDetails);
+      }
+    )
   }
 
 }
