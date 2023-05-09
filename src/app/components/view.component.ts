@@ -50,7 +50,7 @@ export class ViewComponent implements OnInit, OnDestroy{
         
         console.log(result.abilities[0].ability.name);
         
-        this.pokeDetails = {name: result.name, type: result.types[0].type.name};
+        this.pokeDetails = {pokeId: 1, name: result.name, type: result.types[0].type.name};
         console.log(this.pokeDetails);
       }
     )

@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import Dexie from 'dexie';
+import { Pokemon } from '../model/pokemon';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,32 +11,47 @@ export class PokemonService {
 
   constructor(private httpClient: HttpClient) { }
 
-  private _pokemonList: String[] = [
-    'Pikachu',
-    'Bulbasaur',
-    'Charizard'
+  onEvent = new Subject<any>()
+
+  private _pokemonList: Pokemon[] = [
+    {pokeId: 1, name: 'Pikachu' },
+    {pokeId: 2, name: 'Bulbasaur' },
+    {pokeId: 3, name: 'Charizard' }
   ];
 
   db = new MyDatabase()
 
-  public get pokemonList(): String[] {
+  public get pokemonList(): Pokemon[] {
     return this._pokemonList;
   }
-  public set pokemonList(value: String[]) {
+  public set pokemonList(value: Pokemon[]) {
     this._pokemonList = value;
   }
 
-  public add(newPoke: String) {
-    this._pokemonList.push(newPoke);
+  public add(newPokename: String) {
+    let newPoke: Pokemon = {name: newPokename }
     //localStorage.setItem("pokeList",this.concatList(this._pokemonList).toString());
-    this.db.pokeStorage.put({value:newPoke})
+    this.db.pokeStorage.put(newPoke)
+
+    this.db.pokeStorage.toArray().then(
+      (result) => {
+        this._pokemonList = result
+        this.onEvent.next('updated!')
+      }
+    )
 
   }
 
-  public deletePokemon(index: number) {
-    this.pokemonList.splice(index, 1);
-    //localStorage.setItem("pokeList", this.concatList(this._pokemonList).toString());
-    this.db.pokeStorage.delete(index);
+  public deletePokemon(id: number) {
+    this.db.pokeStorage.delete(id);
+
+    this.db.pokeStorage.toArray().then(
+      (result) => {
+        this._pokemonList = result
+        this.onEvent.next('updated!')
+      }
+    )
+
   }
 
   public concatList(pokeList: String[]): String {
@@ -51,60 +68,38 @@ export class PokemonService {
     return concatList;
   }
 
-  public getFromLocal() {
-    console.info('getting from local');
 
-    //@ts-ignore
-    if (localStorage.getItem("pokeList") == null || localStorage.getItem("pokeList")?.length <= 0) {
-      let pokeList = this.concatList(this._pokemonList).toString();
+  // public async getFromDexie() {
+  //   console.info('getting from local');
 
-      console.info(this._pokemonList)
-      console.info('concatted', pokeList);
+  //   const pokeList = await this.db.pokeStorage.toArray();
 
-      localStorage.setItem("pokeList", pokeList);
-    } else {
+  //   console.info(pokeList)
 
-      //@ts-ignore
-      this._pokemonList = localStorage.getItem("pokeList").split("|").filter(x => x.length > 0)
-      for (let pokemon of this._pokemonList) {
-        console.log(pokemon)
-      }
+  //   if (pokeList.length <= 0) {
+  //   } else {
+  //     console.info('>>>populating pokelist')
+  //     let pokeListString: String[] = []
+  //     for (let pokemon of pokeList) {
+  //       pokeListString.push(pokemon.value)
+  //     }
+  //     this._pokemonList = pokeListString;
+  //     console.info(this._pokemonList)
+  //   }
+  // }
 
-    }
-  }
-
-  public async getFromDexie() {
-    console.info('getting from local');
-
-    const pokeList = await this.db.pokeStorage.toArray();
-
-    console.info(pokeList)
-
-    if (pokeList.length <= 0) {
-    } else {
-      console.info('>>>populating pokelist')
-      let pokeListString: String[] = []
-      for (let pokemon of pokeList) {
-        pokeListString.push(pokemon.value)
-      }
-      this._pokemonList = pokeListString;
-      console.info(this._pokemonList)
-    }
-
-
-  }
 }
 
 export class MyDatabase extends Dexie {
   // Define the schema of the database
-  pokeStorage: Dexie.Table<{ value: String }, number>;
+  pokeStorage: Dexie.Table<Pokemon, number>;
 
   constructor() {
     super('testDatabase');
 
     // Define the tables and indexes
     this.version(1).stores({
-      createdTable: '++id'
+      createdTable: '++pokeId'
     });
 
     // Set the reference to the tables

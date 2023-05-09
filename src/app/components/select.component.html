@@ -5,14 +5,19 @@
 </form>
 
 <table>
-    <tr *ngFor="let p of pokemonList, let i = index">
+    <tr *ngFor="let p of pokemonList">
         <td>
-            <a [routerLink]="['view', p]">
-                {{p}}
+            <a [routerLink]="['view', p.name]">
+                {{p.name}}
             </a>
         </td>
         <td>
-            <button (click)="deletePokemon(i)">Delete</button>
+            <button (click)="deletePokemon(p)">Delete</button>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button (click)="test()">Test</button>
         </td>
     </tr>
     
